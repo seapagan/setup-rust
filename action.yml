@@ -18,7 +18,12 @@ runs:
       env:
         COMPONENTS: ${{ inputs.components }}
         TOOLCHAIN: ${{ inputs.toolchain }}
-      run: |
+      run: | # zizmor: ignore[github-env] TOOLCHAIN rejects CR and LF before this fixed-name write.
+        if [[ "$TOOLCHAIN" == *$'\n'* || "$TOOLCHAIN" == *$'\r'* ]]; then
+          printf 'Toolchain must not contain newline characters\n' >&2
+          exit 1
+        fi
+
         rustup toolchain install "$TOOLCHAIN" --profile minimal
         printf 'RUSTUP_TOOLCHAIN=%s\n' "$TOOLCHAIN" >> "$GITHUB_ENV"
 
