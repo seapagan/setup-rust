@@ -34,15 +34,7 @@ jobs:
 
       - name: Capture persistent default and verify requested toolchain differs
         shell: bash
-        run: |
-          set -euo pipefail
-          persistent_default=$(rustup default)
-          printf '%s\n' "$persistent_default" > "$RUNNER_TEMP/rustup-default-before"
-          printf 'Persistent rustup default before action: %s\n' "$persistent_default"
-
-          default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
-          printf 'Runner default Rust release: %s\n' "$default_release"
-          test "$default_release" != "$TEST_TOOLCHAIN"
+        run: bash tests/integration/capture-state.sh "$TEST_TOOLCHAIN"
 
       - name: Set up Rust with components
         uses: ./
@@ -52,22 +44,9 @@ jobs:
 
       - name: Verify persistent default, selected toolchain, and components
         shell: bash
-        run: |
-          set -euo pipefail
-          persistent_default_before=$(<"$RUNNER_TEMP/rustup-default-before")
-          persistent_default_after=$(rustup default)
-          test "$persistent_default_after" = "$persistent_default_before"
-
-          test "$RUSTUP_TOOLCHAIN" = "$TEST_TOOLCHAIN"
-
-          rustc_release=$(rustc --version --verbose | sed -n 's/^release: //p')
-          cargo_release=$(cargo --version --verbose | sed -n 's/^release: //p')
-          test "$rustc_release" = "$TEST_TOOLCHAIN"
-          test "$cargo_release" = "$TEST_TOOLCHAIN"
-
-          installed=$(rustup component list --toolchain "$TEST_TOOLCHAIN" --installed)
-          grep -Eq '^rustfmt(-|$)' <<< "$installed"
-          grep -Eq '^clippy(-|$)' <<< "$installed"
+        run: >-
+          bash tests/integration/verify-state.sh "$TEST_TOOLCHAIN"
+          rustfmt clippy
 
   no-components:
     name: Components omitted (ubuntu-24.04)
@@ -82,15 +61,7 @@ jobs:
 
       - name: Capture persistent default and verify requested toolchain differs
         shell: bash
-        run: |
-          set -euo pipefail
-          persistent_default=$(rustup default)
-          printf '%s\n' "$persistent_default" > "$RUNNER_TEMP/rustup-default-before"
-          printf 'Persistent rustup default before action: %s\n' "$persistent_default"
-
-          default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
-          printf 'Runner default Rust release: %s\n' "$default_release"
-          test "$default_release" != "$TEST_TOOLCHAIN"
+        run: bash tests/integration/capture-state.sh "$TEST_TOOLCHAIN"
 
       - name: Set up Rust without components
         uses: ./
@@ -99,15 +70,4 @@ jobs:
 
       - name: Verify persistent default and selected toolchain
         shell: bash
-        run: |
-          set -euo pipefail
-          persistent_default_before=$(<"$RUNNER_TEMP/rustup-default-before")
-          persistent_default_after=$(rustup default)
-          test "$persistent_default_after" = "$persistent_default_before"
-
-          test "$RUSTUP_TOOLCHAIN" = "$TEST_TOOLCHAIN"
-
-          rustc_release=$(rustc --version --verbose | sed -n 's/^release: //p')
-          cargo_release=$(cargo --version --verbose | sed -n 's/^release: //p')
-          test "$rustc_release" = "$TEST_TOOLCHAIN"
-          test "$cargo_release" = "$TEST_TOOLCHAIN"
+        run: bash tests/integration/verify-state.sh "$TEST_TOOLCHAIN"
