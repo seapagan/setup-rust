@@ -32,10 +32,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verify requested toolchain differs from runner default
+      - name: Capture persistent default and verify requested toolchain differs
         shell: bash
         run: |
           set -euo pipefail
+          persistent_default=$(rustup default)
+          printf '%s\n' "$persistent_default" > "$RUNNER_TEMP/rustup-default-before"
+          printf 'Persistent rustup default before action: %s\n' "$persistent_default"
+
           default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
           printf 'Runner default Rust release: %s\n' "$default_release"
           test "$default_release" != "$TEST_TOOLCHAIN"
@@ -46,10 +50,14 @@ jobs:
           toolchain: ${{ env.TEST_TOOLCHAIN }}
           components: rustfmt clippy
 
-      - name: Verify selected toolchain and components
+      - name: Verify persistent default, selected toolchain, and components
         shell: bash
         run: |
           set -euo pipefail
+          persistent_default_before=$(<"$RUNNER_TEMP/rustup-default-before")
+          persistent_default_after=$(rustup default)
+          test "$persistent_default_after" = "$persistent_default_before"
+
           test "$RUSTUP_TOOLCHAIN" = "$TEST_TOOLCHAIN"
 
           rustc_release=$(rustc --version --verbose | sed -n 's/^release: //p')
@@ -72,10 +80,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verify requested toolchain differs from runner default
+      - name: Capture persistent default and verify requested toolchain differs
         shell: bash
         run: |
           set -euo pipefail
+          persistent_default=$(rustup default)
+          printf '%s\n' "$persistent_default" > "$RUNNER_TEMP/rustup-default-before"
+          printf 'Persistent rustup default before action: %s\n' "$persistent_default"
+
           default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
           printf 'Runner default Rust release: %s\n' "$default_release"
           test "$default_release" != "$TEST_TOOLCHAIN"
@@ -85,10 +97,14 @@ jobs:
         with:
           toolchain: ${{ env.TEST_TOOLCHAIN }}
 
-      - name: Verify selected toolchain
+      - name: Verify persistent default and selected toolchain
         shell: bash
         run: |
           set -euo pipefail
+          persistent_default_before=$(<"$RUNNER_TEMP/rustup-default-before")
+          persistent_default_after=$(rustup default)
+          test "$persistent_default_after" = "$persistent_default_before"
+
           test "$RUSTUP_TOOLCHAIN" = "$TEST_TOOLCHAIN"
 
           rustc_release=$(rustc --version --verbose | sed -n 's/^release: //p')
