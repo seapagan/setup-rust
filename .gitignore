@@ -218,3 +218,8 @@ pyrightconfig.json
 .agents/
 AGENTS.md
 CLAUDE.md
+packed-repo.xml
+packed-repo.xml.gz
+
+# git temp files.
+*.patch
