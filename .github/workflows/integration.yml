@@ -1,0 +1,97 @@
+name: Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TEST_TOOLCHAIN: "1.88.0"
+
+jobs:
+  components:
+    name: Components (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - windows-2025
+          - macos-15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify requested toolchain differs from runner default
+        shell: bash
+        run: |
+          set -euo pipefail
+          default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
+          printf 'Runner default Rust release: %s\n' "$default_release"
+          test "$default_release" != "$TEST_TOOLCHAIN"
+
+      - name: Set up Rust with components
+        uses: ./
+        with:
+          toolchain: ${{ env.TEST_TOOLCHAIN }}
+          components: rustfmt clippy
+
+      - name: Verify selected toolchain and components
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUSTUP_TOOLCHAIN" = "$TEST_TOOLCHAIN"
+
+          rustc_release=$(rustc --version --verbose | sed -n 's/^release: //p')
+          cargo_release=$(cargo --version --verbose | sed -n 's/^release: //p')
+          test "$rustc_release" = "$TEST_TOOLCHAIN"
+          test "$cargo_release" = "$TEST_TOOLCHAIN"
+
+          installed=$(rustup component list --toolchain "$TEST_TOOLCHAIN" --installed)
+          grep -Eq '^rustfmt(-|$)' <<< "$installed"
+          grep -Eq '^clippy(-|$)' <<< "$installed"
+
+  no-components:
+    name: Components omitted (ubuntu-24.04)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify requested toolchain differs from runner default
+        shell: bash
+        run: |
+          set -euo pipefail
+          default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
+          printf 'Runner default Rust release: %s\n' "$default_release"
+          test "$default_release" != "$TEST_TOOLCHAIN"
+
+      - name: Set up Rust without components
+        uses: ./
+        with:
+          toolchain: ${{ env.TEST_TOOLCHAIN }}
+
+      - name: Verify selected toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUSTUP_TOOLCHAIN" = "$TEST_TOOLCHAIN"
+
+          rustc_release=$(rustc --version --verbose | sed -n 's/^release: //p')
+          cargo_release=$(cargo --version --verbose | sed -n 's/^release: //p')
+          test "$rustc_release" = "$TEST_TOOLCHAIN"
+          test "$cargo_release" = "$TEST_TOOLCHAIN"
