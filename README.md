@@ -12,7 +12,7 @@ Self-hosted runners must provide both.
 | Input        | Required | Default | Description                                  |
 | ------------ | -------- | ------- | -------------------------------------------- |
 | `toolchain`  | Yes      | —       | Exact toolchain supplied to rustup.          |
-| `components` | No       | `""`    | Whitespace-separated rustup component names. |
+| `components` | No       | `""`    | Space-separated rustup component names.      |
 
 ## Usage
 
