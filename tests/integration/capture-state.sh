@@ -2,8 +2,8 @@
 set -euo pipefail
 
 if (($# != 1)); then
-	printf 'Usage: bash tests/integration/capture-state.sh <toolchain>\n' >&2
-	exit 2
+  printf 'Usage: bash tests/integration/capture-state.sh <toolchain>\n' >&2
+  exit 2
 fi
 
 readonly test_toolchain=$1
@@ -17,7 +17,7 @@ default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
 printf 'Runner default Rust release: %s\n' "$default_release"
 
 if [[ "$default_release" == "$test_toolchain" ]]; then
-	printf 'Requested Rust release unexpectedly matches the runner default: %s\n' \
-		"$test_toolchain" >&2
-	exit 1
+  printf 'Requested Rust release unexpectedly matches the runner default: %s\n' \
+    "$test_toolchain" >&2
+  exit 1
 fi
