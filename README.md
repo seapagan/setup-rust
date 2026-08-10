@@ -4,16 +4,39 @@ Install an exact Rust toolchain and optional rustup components in a GitHub Actio
 
 ## Requirements
 
-Use a runner with Bash and rustup available.
+GitHub-hosted Linux, Windows, and macOS runners include Bash and rustup.
+Self-hosted runners must provide both.
 
 ## Inputs
 
-| Input | Required | Default | Description |
-| --- | --- | --- | --- |
-| `toolchain` | Yes | — | Exact toolchain supplied to rustup. |
-| `components` | No | `""` | Whitespace-separated rustup component names. |
+| Input        | Required | Default | Description                                  |
+| ------------ | -------- | ------- | -------------------------------------------- |
+| `toolchain`  | Yes      | —       | Exact toolchain supplied to rustup.          |
+| `components` | No       | `""`    | Whitespace-separated rustup component names. |
 
 ## Usage
+
+Use an exact Rust toolchain version directly:
+
+```yaml
+steps:
+  - uses: seapagan/setup-rust@main
+    with:
+      toolchain: "1.97.1"
+      components: rustfmt clippy
+```
+
+Omit `components` when you need no extra components:
+
+```yaml
+steps:
+  - uses: seapagan/setup-rust@main
+    with:
+      toolchain: "1.97.1"
+```
+
+You can also keep the Rust version in a GitHub repository variable and pass it
+to the action:
 
 ```yaml
 env:
