@@ -20,7 +20,7 @@ runs:
         TOOLCHAIN: ${{ inputs.toolchain }}
       run: |
         rustup toolchain install "$TOOLCHAIN" --profile minimal
-        rustup default "$TOOLCHAIN"
+        printf 'RUSTUP_TOOLCHAIN=%s\n' "$TOOLCHAIN" >> "$GITHUB_ENV"
 
         components=()
         read -ra components <<< "$COMPONENTS"

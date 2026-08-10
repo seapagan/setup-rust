@@ -59,4 +59,7 @@ Omit `components` when you need no extra components:
 
 ## Behavior
 
-The action runs `rustup toolchain install` with `--profile minimal`, makes the selected toolchain the default with `rustup default`, and installs requested components for that toolchain.
+The action runs `rustup toolchain install` with `--profile minimal`, selects that
+toolchain for subsequent steps in the job through `RUSTUP_TOOLCHAIN`, and installs
+requested components for that toolchain. It does not change rustup's persistent
+default toolchain.
