@@ -63,3 +63,25 @@ The action runs `rustup toolchain install` with `--profile minimal`, selects tha
 toolchain for subsequent steps in the job through `RUSTUP_TOOLCHAIN`, and installs
 requested components for that toolchain. It does not change rustup's persistent
 default toolchain.
+
+## Development
+
+Development requires [Task](https://taskfile.dev/installation/),
+[Bash](https://www.gnu.org/software/bash/),
+[ShellCheck](https://www.shellcheck.net/),
+[shfmt](https://github.com/mvdan/sh/tree/master/cmd/shfmt#shfmt),
+[actionlint](https://github.com/rhysd/actionlint#installation),
+[zizmor](https://docs.zizmor.sh/installation/), and
+[Git](https://git-scm.com/downloads). Follow each project's authoritative
+installation guidance for your platform.
+
+Run the complete mandatory local validation suite from the repository root:
+
+```bash
+task validate
+```
+
+Run `task --list` to discover the individual checks. Local validation covers
+static checks only. The hosted
+[Integration workflow](.github/workflows/integration.yml) remains authoritative
+for the action's behavior across GitHub-hosted Linux, Windows, and macOS runners.

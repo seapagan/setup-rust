@@ -1,0 +1,55 @@
+version: "3"
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  validate:
+    desc: Run the complete mandatory local validation suite
+    cmds:
+      - task: bash
+      - task: shellcheck
+      - task: shfmt
+      - task: actionlint
+      - task: zizmor
+      - task: whitespace
+
+  bash:
+    desc: Check Bash syntax in integration helpers
+    cmds:
+      - >-
+        bash -n tests/integration/capture-state.sh
+        tests/integration/verify-state.sh
+
+  shellcheck:
+    desc: Run ShellCheck using each helper's declared shell
+    cmds:
+      - >-
+        shellcheck tests/integration/capture-state.sh
+        tests/integration/verify-state.sh
+
+  shfmt:
+    desc: Check integration helper formatting
+    cmds:
+      - >-
+        shfmt -d -i 2 tests/integration/capture-state.sh
+        tests/integration/verify-state.sh
+
+  actionlint:
+    desc: Validate GitHub Actions workflow syntax
+    cmds:
+      - actionlint
+
+  zizmor:
+    desc: Audit GitHub Actions definitions offline
+    cmds:
+      - >-
+        zizmor --offline --strict-collection --no-config
+        .
+
+  whitespace:
+    desc: Check changed lines for Git whitespace errors
+    cmds:
+      - git diff --check
