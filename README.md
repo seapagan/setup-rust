@@ -1,6 +1,7 @@
 # Set up Rust
 
-Install an exact Rust toolchain and optional rustup components in a GitHub Actions workflow.
+Install a Rust toolchain specification and optional rustup components and targets
+in a GitHub Actions workflow.
 
 ## Requirements
 
@@ -9,14 +10,41 @@ Self-hosted runners must provide both.
 
 ## Inputs
 
-| Input        | Required | Default | Description                                  |
-| ------------ | -------- | ------- | -------------------------------------------- |
-| `toolchain`  | Yes      | —       | Exact toolchain supplied to rustup.          |
-| `components` | No       | `""`    | Space-separated rustup component names.      |
+| Input        | Required | Default | Description                             |
+| ------------ | -------- | ------- | --------------------------------------- |
+| `toolchain`  | Yes      | —       | Rustup toolchain specification.         |
+| `components` | No       | `""`    | Space-separated rustup component names. |
+| `targets`    | No       | `""`    | Space-separated rustup target names.    |
+
+`toolchain` accepts a standard
+[rustup toolchain specification](https://rust-lang.github.io/rustup/concepts/toolchains.html),
+including explicit releases such as `1.97.1`, the `stable`, `beta`, and
+`nightly` channels, and dated nightlies such as `nightly-2025-06-26`.
+Reproducible CI should generally prefer an explicit release or dated nightly
+because the channel names move as new toolchains are published.
 
 ## Usage
 
-Use an exact Rust toolchain version directly:
+Use an explicit Rust release:
+
+```yaml
+steps:
+  - uses: seapagan/setup-rust@main
+    with:
+      toolchain: "1.97.1"
+```
+
+Channel names and other rustup toolchain specifications work through the same
+input. For example, use the current stable channel:
+
+```yaml
+steps:
+  - uses: seapagan/setup-rust@main
+    with:
+      toolchain: stable
+```
+
+Install optional components for the selected toolchain:
 
 ```yaml
 steps:
@@ -26,43 +54,27 @@ steps:
       components: rustfmt clippy
 ```
 
-Omit `components` when you need no extra components:
+Install optional Rust target support, including more than one target when
+needed:
 
 ```yaml
 steps:
   - uses: seapagan/setup-rust@main
     with:
-      toolchain: "1.97.1"
-```
-
-You can also keep the Rust version in a GitHub repository variable and pass it
-to the action:
-
-```yaml
-env:
-  RUST_TOOLCHAIN: ${{ vars.RUST_TOOLCHAIN }}
-
-steps:
-  - uses: seapagan/setup-rust@main
-    with:
-      toolchain: ${{ env.RUST_TOOLCHAIN }}
-      components: rustfmt clippy
-```
-
-Omit `components` when you need no extra components:
-
-```yaml
-- uses: seapagan/setup-rust@main
-  with:
-    toolchain: ${{ env.RUST_TOOLCHAIN }}
+      toolchain: nightly-2025-06-26
+      targets: wasm32-unknown-unknown thumbv7em-none-eabihf
 ```
 
 ## Behavior
 
 The action runs `rustup toolchain install` with `--profile minimal`, selects that
 toolchain for subsequent steps in the job through `RUSTUP_TOOLCHAIN`, and installs
-requested components for that toolchain. It does not change rustup's persistent
-default toolchain.
+requested components and targets explicitly for that toolchain. It does not
+change rustup's persistent default toolchain.
+
+Installing a target adds Rust's standard library for that target. Cross-compiling
+may also require a suitable linker, platform SDK, or other external tools; this
+action does not install them.
 
 ## Development
 
