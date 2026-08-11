@@ -29,7 +29,7 @@ Use an explicit Rust release:
 
 ```yaml
 steps:
-  - uses: seapagan/setup-rust@main
+  - uses: seapagan/setup-rust@v1
     with:
       toolchain: "1.97.1"
 ```
@@ -39,7 +39,7 @@ input. For example, use the current stable channel:
 
 ```yaml
 steps:
-  - uses: seapagan/setup-rust@main
+  - uses: seapagan/setup-rust@v1
     with:
       toolchain: stable
 ```
@@ -48,7 +48,7 @@ Install optional components for the selected toolchain:
 
 ```yaml
 steps:
-  - uses: seapagan/setup-rust@main
+  - uses: seapagan/setup-rust@v1
     with:
       toolchain: "1.97.1"
       components: rustfmt clippy
@@ -59,10 +59,22 @@ needed:
 
 ```yaml
 steps:
-  - uses: seapagan/setup-rust@main
+  - uses: seapagan/setup-rust@v1
     with:
       toolchain: nightly-2025-06-26
       targets: wasm32-unknown-unknown thumbv7em-none-eabihf
+```
+
+### Pinning
+
+`@v1` is the convenient stable major-version reference and may intentionally
+move to compatible future `v1.x.x` releases. Use `@v1.0.0` to select this exact
+immutable release. Consumers requiring the strongest reproducibility and
+supply-chain protection should pin the action to a full commit SHA and retain a
+human-readable version comment where practical:
+
+```yaml
+- uses: seapagan/setup-rust@<full-sha> # v1.0.0
 ```
 
 ## Behavior
