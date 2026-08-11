@@ -1,22 +1,27 @@
 name: Set up Rust
-description: Install the exact Rust toolchain and optional components
+description: Install a Rust toolchain specification with optional components and targets
 
 inputs:
   toolchain:
-    description: Exact Rust toolchain version
+    description: Rustup toolchain specification to install
     required: true
   components:
     description: Space-separated rustup components to install
+    required: false
+    default: ""
+  targets:
+    description: Space-separated rustup targets to install
     required: false
     default: ""
 
 runs:
   using: composite
   steps:
-    - name: Install exact Rust toolchain
+    - name: Install Rust toolchain
       shell: bash
       env:
         COMPONENTS: ${{ inputs.components }}
+        TARGETS: ${{ inputs.targets }}
         TOOLCHAIN: ${{ inputs.toolchain }}
       run: | # zizmor: ignore[github-env] TOOLCHAIN rejects CR and LF before this fixed-name write.
         if [[ "$TOOLCHAIN" == *$'\n'* || "$TOOLCHAIN" == *$'\r'* ]]; then
@@ -31,4 +36,10 @@ runs:
         read -ra components <<< "$COMPONENTS"
         if (( ${#components[@]} > 0 )); then
           rustup component add --toolchain "$TOOLCHAIN" "${components[@]}"
+        fi
+
+        targets=()
+        read -ra targets <<< "$TARGETS"
+        if (( ${#targets[@]} > 0 )); then
+          rustup target add --toolchain "$TOOLCHAIN" "${targets[@]}"
         fi

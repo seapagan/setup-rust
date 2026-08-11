@@ -13,11 +13,10 @@ persistent_default=$(rustup default)
 printf '%s\n' "$persistent_default" >"$state_file"
 printf 'Persistent rustup default before action: %s\n' "$persistent_default"
 
-default_release=$(rustc --version --verbose | sed -n 's/^release: //p')
-printf 'Runner default Rust release: %s\n' "$default_release"
-
-if [[ "$default_release" == "$test_toolchain" ]]; then
-  printf 'Requested Rust release unexpectedly matches the runner default: %s\n' \
+default_toolchain=${persistent_default%% *}
+if [[ "$default_toolchain" == "$test_toolchain" ||
+  "$default_toolchain" == "$test_toolchain"-* ]]; then
+  printf 'Requested Rust toolchain unexpectedly matches the persistent default: %s\n' \
     "$test_toolchain" >&2
   exit 1
 fi

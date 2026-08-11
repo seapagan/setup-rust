@@ -11,6 +11,8 @@ permissions:
   contents: read
 
 env:
+  TEST_NIGHTLY: nightly-2025-06-26
+  TEST_TARGET: wasm32-unknown-unknown
   TEST_TOOLCHAIN: "1.88.0"
 
 jobs:
@@ -48,8 +50,8 @@ jobs:
           bash tests/integration/verify-state.sh "$TEST_TOOLCHAIN"
           rustfmt clippy
 
-  no-components:
-    name: Components omitted (ubuntu-24.04)
+  toolchain-spec-and-targets:
+    name: Components omitted, dated nightly with target (ubuntu-24.04)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
@@ -61,13 +63,16 @@ jobs:
 
       - name: Capture persistent default and verify requested toolchain differs
         shell: bash
-        run: bash tests/integration/capture-state.sh "$TEST_TOOLCHAIN"
+        run: bash tests/integration/capture-state.sh "$TEST_NIGHTLY"
 
-      - name: Set up Rust without components
+      - name: Set up dated nightly without components and with target
         uses: ./
         with:
-          toolchain: ${{ env.TEST_TOOLCHAIN }}
+          toolchain: ${{ env.TEST_NIGHTLY }}
+          targets: ${{ env.TEST_TARGET }}
 
-      - name: Verify persistent default and selected toolchain
+      - name: Verify persistent default, selected toolchain, and target
         shell: bash
-        run: bash tests/integration/verify-state.sh "$TEST_TOOLCHAIN"
+        run: >-
+          bash tests/integration/verify-state.sh "$TEST_NIGHTLY"
+          --targets "$TEST_TARGET"
