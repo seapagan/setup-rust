@@ -93,6 +93,20 @@ Run the complete mandatory local validation suite from the repository root:
 task validate
 ```
 
+Maintainers can generate or update CHANGELOG.md with:
+
+```bash
+task changelog
+```
+
+This uses [github-changelog-md](https://changelog.seapagan.net) which must be
+installed and available on your PATH. To pass any other CLI options to the task,
+place them after `--`:
+
+```bash
+task changelog -- -n v1.1.0
+```
+
 Run `task --list` to discover the individual checks. Local validation covers
 static checks only. The hosted
 [Integration workflow](.github/workflows/integration.yml) remains authoritative

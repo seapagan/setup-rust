@@ -58,3 +58,8 @@ tasks:
         else
           git diff --check
         fi
+
+  changelog:
+    desc: Generate or update CHANGELOG.md
+    cmds:
+      - github-changelog-md {{.CLI_ARGS}}

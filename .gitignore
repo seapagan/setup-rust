@@ -223,3 +223,4 @@ packed-repo.xml.gz
 
 # git temp files.
 *.patch
+.changelog_generator.toml
