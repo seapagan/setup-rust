@@ -50,6 +50,11 @@ tasks:
         .
 
   whitespace:
-    desc: Check changed lines for Git whitespace errors
+    desc: Check local changes or a configured Git range for whitespace errors
     cmds:
-      - git diff --check
+      - |
+        if [ -n "${WHITESPACE_RANGE:-}" ]; then
+          git diff --check "$WHITESPACE_RANGE" --
+        else
+          git diff --check
+        fi
