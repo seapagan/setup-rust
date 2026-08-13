@@ -1,6 +1,10 @@
 name: Set up Rust
 description: Install a Rust toolchain specification with optional components and targets
 
+branding:
+  icon: terminal
+  color: orange
+
 inputs:
   toolchain:
     description: Rustup toolchain specification to install
@@ -23,7 +27,8 @@ runs:
         COMPONENTS: ${{ inputs.components }}
         TARGETS: ${{ inputs.targets }}
         TOOLCHAIN: ${{ inputs.toolchain }}
-      run: | # zizmor: ignore[github-env] TOOLCHAIN rejects CR and LF before this fixed-name write.
+      run:
+        | # zizmor: ignore[github-env] TOOLCHAIN rejects CR and LF before this fixed-name write.
         if [[ "$TOOLCHAIN" == *$'\n'* || "$TOOLCHAIN" == *$'\r'* ]]; then
           printf 'Toolchain must not contain newline characters\n' >&2
           exit 1
